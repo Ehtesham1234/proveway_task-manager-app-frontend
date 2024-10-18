@@ -1,8 +1,9 @@
 import axios from "axios";
 
+console.log(import.meta.env.VITE_API_BASE_URL);
 const API_BASE_URL =
-  "https://proveway-task-manager-app-backend.onrender.com/api/v1";
-console.log(API_BASE_URL);
+  import.meta.env.VITE_API_BASE_URL || "http://localhost:5000/api/v1";
+
 const api = axios.create({
   baseURL: API_BASE_URL,
   headers: {
