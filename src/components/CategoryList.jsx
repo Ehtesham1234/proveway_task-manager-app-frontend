@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
+import apiService from "../services/api";
 
 const CategoryList = () => {
   const [categories, setCategories] = useState([]);
@@ -11,9 +11,7 @@ const CategoryList = () => {
 
   const fetchCategories = async () => {
     try {
-      const response = await axios.get(
-        "http://localhost:5000/api/v1/categories"
-      );
+      const response = await apiService.getCategories();
       setCategories(response.data.data.categories);
     } catch (error) {
       console.error("Error fetching categories:", error);
@@ -23,9 +21,7 @@ const CategoryList = () => {
   const createCategory = async (e) => {
     e.preventDefault();
     try {
-      await axios.post("http://localhost:5000/api/v1/categories", {
-        name: newCategory,
-      });
+      await apiService.createCategory({ name: newCategory });
       setNewCategory("");
       fetchCategories();
     } catch (error) {
@@ -35,7 +31,7 @@ const CategoryList = () => {
 
   const deleteCategory = async (id) => {
     try {
-      await axios.delete(`http://localhost:5000/api/v1/categories/${id}`);
+      await apiService.deleteCategory(id);
       fetchCategories();
     } catch (error) {
       console.error("Error deleting category:", error);

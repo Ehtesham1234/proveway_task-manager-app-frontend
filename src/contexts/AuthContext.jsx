@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
-import axios from "axios";
+import apiService from "../services/api";
 
 const AuthContext = createContext();
 
@@ -15,14 +15,12 @@ export const AuthProvider = ({ children }) => {
       const token = localStorage.getItem("token");
       if (token) {
         try {
-          axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
-          const response = await axios.get("http://localhost:5000/api/v1/user");
+          const response = await apiService.getUser();
           setUser(response.data.data.user);
           setIsAuthenticated(true);
         } catch (error) {
           console.error("Error verifying token:", error);
           localStorage.removeItem("token");
-          delete axios.defaults.headers.common["Authorization"];
         }
       }
       setIsLoading(false);
@@ -33,16 +31,10 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (username, password) => {
     try {
-      const response = await axios.post("http://localhost:5000/api/v1/login", {
-        username,
-        password,
-      });
+      const response = await apiService.login(username, password);
       setUser(response.data.data.user);
       setIsAuthenticated(true);
       localStorage.setItem("token", response.data.data.token);
-      axios.defaults.headers.common[
-        "Authorization"
-      ] = `Bearer ${response.data.data.token}`;
       return true;
     } catch (error) {
       console.error("Login failed:", error);
@@ -52,11 +44,7 @@ export const AuthProvider = ({ children }) => {
 
   const signup = async (username, email, password) => {
     try {
-      const response = await axios.post("http://localhost:5000/api/v1/signup", {
-        username,
-        email,
-        password,
-      });
+      await apiService.signup(username, email, password);
       return true;
     } catch (error) {
       console.error("Signup failed:", error);
@@ -66,11 +54,10 @@ export const AuthProvider = ({ children }) => {
 
   const logout = async () => {
     try {
-      await axios.post("http://localhost:5000/api/v1/logout");
+      await apiService.logout();
       setUser(null);
       setIsAuthenticated(false);
       localStorage.removeItem("token");
-      delete axios.defaults.headers.common["Authorization"];
     } catch (error) {
       console.error("Logout failed:", error);
     }

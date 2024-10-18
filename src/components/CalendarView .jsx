@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
 import Calendar from "react-calendar";
 import "react-calendar/dist/Calendar.css";
+import apiService from "../services/api";
 
 const CalendarView = () => {
   const [tasks, setTasks] = useState([]);
@@ -13,10 +13,8 @@ const CalendarView = () => {
 
   const fetchTasks = async () => {
     try {
-      const response = await axios.get(`http://localhost:5000/api/v1/tasks`, {
-        params: {
-          dueDate: selectedDate.toISOString().split("T")[0],
-        },
+      const response = await apiService.getTasks({
+        dueDate: selectedDate.toISOString().split("T")[0],
       });
       setTasks(response.data.data.tasks);
     } catch (error) {
